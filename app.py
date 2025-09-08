@@ -43,7 +43,6 @@ def add():
             new_id += 1
 
         new_post = {
-            #"id": len(blog_posts) + 1,
             "id": new_id,
             "author": author,
             "title": title,
