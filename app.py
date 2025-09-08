@@ -37,8 +37,14 @@ def add():
         with open("data.json", "r", encoding="UTF-8") as fileobj:
             blog_posts = json.load(fileobj)
 
+        existing_ids = {post["id"] for post in blog_posts}
+        new_id = 1
+        while new_id in existing_ids:
+            new_id += 1
+
         new_post = {
-            "id": len(blog_posts) + 1,
+            #"id": len(blog_posts) + 1,
+            "id": new_id,
             "author": author,
             "title": title,
             "content": content

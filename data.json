@@ -16,5 +16,11 @@
         "author": "Mustermann",
         "title": "Test",
         "content": "testtest"
+    },
+    {
+        "id": 4,
+        "author": "blub",
+        "title": "test2",
+        "content": "jvkhfkk"
     }
 ]
