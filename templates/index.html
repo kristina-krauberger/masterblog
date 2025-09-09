@@ -8,13 +8,24 @@
 </head>
 <body>
     <h1>Welcome to My Flask Blog!</h1>
-    <a href="/add"><button class="styled">Add new post</button></a>
+    <a href="/add"><button class="button-add">ADD NEW POST</button></a>
     <p></p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="flash-{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
     {% for data in posts %}
     <div class="post">
         <h2>{{ data["title"] }}</h2>  <!-- besser data.title -->
         <p><em>Written by {{ data["author"] }}</em></p>
         <p>{{ data["content"] }}</p>
+        <a href="/delete/{{ data['id'] }}"><button class="button-delete">Delete</button></a>
+        <a href="/update/{{ data['id'] }}"><button class="button-update">Update</button></a>
     </div>
     {% endfor %}
 </body>

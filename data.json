@@ -1,11 +1,5 @@
 [
     {
-        "id": 1,
-        "author": "John Doe",
-        "title": "First Post",
-        "content": "This is my first post."
-    },
-    {
         "id": 2,
         "author": "Jane Doe",
         "title": "Second Post",
@@ -16,17 +10,5 @@
         "author": "Mustermann",
         "title": "Test",
         "content": "testtest"
-    },
-    {
-        "id": 4,
-        "author": "blub",
-        "title": "test2",
-        "content": "jvkhfkk"
-    },
-    {
-        "id": 5,
-        "author": "gjhbj",
-        "title": "test3",
-        "content": "kjgkgk"
     }
 ]
