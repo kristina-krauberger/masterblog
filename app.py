@@ -89,5 +89,63 @@ def delete(post_id):
     return redirect(url_for('index'))
 
 
+def fetch_post_by_id(post_id):
+    """
+    Retrieve a blog post by its ID from the data.json file.
+    Args:
+        post_id (int): The ID of the blog post to retrieve.
+    Returns:
+        dict or None: The blog post as a dictionary if found, otherwise None.
+    """
+
+    with open("data.json", "r", encoding="UTF-8") as fileobj:
+        blog_posts = json.load(fileobj)
+
+    for blog_post in blog_posts:
+        if post_id == blog_post["id"]:
+            return blog_post
+    return None
+
+
+@app.route('/update/<int:post_id>', methods=['GET', 'POST'])
+def update(post_id):
+    """
+        Handle GET and POST requests to update an existing blog post.
+        GET: Load the existing blog post data by ID and render the update form.
+        POST: Receive updated form data, modify the post in data.json,
+        flash a success message, and redirect to the homepage.
+
+        Args:
+            post_id (int): The ID of the blog post to update.
+        Returns:
+            Response: Rendered update form (GET) or redirect to index page (POST).
+        """
+    searched_blog_post = fetch_post_by_id(post_id)
+    if searched_blog_post is None:
+        return "Post not found", 404
+
+    if request.method == 'POST':
+        title = request.form.get("title", "--")
+        author = request.form.get("author", "--")
+        content = request.form.get("content", "--")
+
+        with open("data.json", "r", encoding="UTF-8") as filebj:
+            blog_posts = json.load(filebj)
+
+        for post in blog_posts:
+            if searched_blog_post["id"] == post["id"]:
+                post["title"] = title
+                post["author"] = author
+                post["content"] = content
+                flash(f"The post '{post['title']}' was successfully updated.", "success")
+                break
+
+        with open("data.json", "w", encoding="UTF-8") as filebj:
+            json.dump(blog_posts, filebj, indent=4, ensure_ascii=False)
+        return redirect(url_for("index"))
+
+    return render_template('update.html', post=searched_blog_post)
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5001, debug=True)
