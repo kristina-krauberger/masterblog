@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, get_flashed_messages
+from flask import Flask, render_template, request, redirect, url_for, flash
 from dotenv import load_dotenv
 import os
 import json
@@ -6,7 +6,7 @@ import json
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
-print("SecretKey", app.secret_key)
+
 
 @app.route('/')
 def index():
@@ -64,6 +64,15 @@ def add():
 
 @app.route('/delete/<int:post_id>')
 def delete(post_id):
+    """
+    Delete a blog post by its ID. Removes the blog post from data.json. Stores a success message using flash.
+
+    Args:
+        post_id (int): The ID of the blog post to be deleted.
+
+    Returns:
+        Response: Redirect to the homepage after deletion.
+    """
 
     with open("data.json", "r", encoding="UTF-8") as fileobj:
         blog_posts = json.load(fileobj)
@@ -79,8 +88,6 @@ def delete(post_id):
 
     return redirect(url_for('index'))
 
-    # Find the blog post with the given id and remove it from the list
-    # Redirect back to the home page
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5001, debug=True)
