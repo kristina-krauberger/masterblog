@@ -73,11 +73,11 @@ def delete(post_id):
     Returns:
         Response: Redirect to the homepage after deletion.
     """
-
     with open("data.json", "r", encoding="UTF-8") as fileobj:
         blog_posts = json.load(fileobj)
 
     for index, blog_post in enumerate(blog_posts):
+        print(index)
         if post_id == blog_post["id"]:
             del blog_posts[index]
             flash(f"The post '{blog_post['title']}' was successfully deleted.", "success")
@@ -92,12 +92,13 @@ def delete(post_id):
 def fetch_post_by_id(post_id):
     """
     Retrieve a blog post by its ID from the data.json file.
+
     Args:
         post_id (int): The ID of the blog post to retrieve.
+
     Returns:
         dict or None: The blog post as a dictionary if found, otherwise None.
     """
-
     with open("data.json", "r", encoding="UTF-8") as fileobj:
         blog_posts = json.load(fileobj)
 
@@ -117,6 +118,7 @@ def update(post_id):
 
         Args:
             post_id (int): The ID of the blog post to update.
+
         Returns:
             Response: Rendered update form (GET) or redirect to index page (POST).
         """
@@ -129,8 +131,8 @@ def update(post_id):
         author = request.form.get("author", "--")
         content = request.form.get("content", "--")
 
-        with open("data.json", "r", encoding="UTF-8") as filebj:
-            blog_posts = json.load(filebj)
+        with open("data.json", "r", encoding="UTF-8") as fileobj:
+            blog_posts = json.load(fileobj)
 
         for post in blog_posts:
             if searched_blog_post["id"] == post["id"]:
@@ -140,11 +142,36 @@ def update(post_id):
                 flash(f"The post '{post['title']}' was successfully updated.", "success")
                 break
 
-        with open("data.json", "w", encoding="UTF-8") as filebj:
-            json.dump(blog_posts, filebj, indent=4, ensure_ascii=False)
-        return redirect(url_for("index"))
+        with open("data.json", "w", encoding="UTF-8") as fileobj:
+            json.dump(blog_posts, fileobj, indent=4, ensure_ascii=False)
 
+        return redirect(url_for("index"))
     return render_template('update.html', post=searched_blog_post)
+
+
+@app.route('/update_like/<int:post_id>', methods=['POST'])
+def update_like(post_id):
+    """
+    Increment likes for a blog post and redirect to index.
+
+    Args:
+        post_id (int): ID of the post to like.
+
+    Returns:
+        Response: Redirect to the homepage.
+    """
+    with open("data.json", "r", encoding="UTF-8") as fileobj:
+        blog_posts = json.load(fileobj)
+
+    for blog_post in blog_posts:
+        if post_id == blog_post['id']:
+            blog_post['likes'] = blog_post.get('likes', 0) + 1
+            break
+
+    with open("data.json", "w", encoding="UTF-8") as fileobj:
+        json.dump(blog_posts, fileobj, indent=4, ensure_ascii=False)
+
+    return redirect(url_for("index"))
 
 
 if __name__ == '__main__':

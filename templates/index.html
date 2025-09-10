@@ -21,11 +21,20 @@
     {% endwith %}
     {% for data in posts %}
     <div class="post">
-        <h2>{{ data["title"] }}</h2>  <!-- besser data.title -->
+        <h2>{{ data["title"] }}</h2>
         <p><em>Written by {{ data["author"] }}</em></p>
         <p>{{ data["content"] }}</p>
-        <a href="/delete/{{ data['id'] }}"><button class="button-delete">Delete</button></a>
-        <a href="/update/{{ data['id'] }}"><button class="button-update">Update</button></a>
+        <div class="button-group">
+            <a href="/delete/{{ data['id'] }}"><button class="button-delete">Delete</button></a>
+            <a href="/update/{{ data['id'] }}"><button class="button-update">Update</button></a>
+            <form action="{{ url_for('update_like', post_id=data['id']) }}" method="POST">
+                <button type="submit" class="button button-like {% if data.get('likes', 0) > 0 %}liked{% endif %}">
+                    <i class="fa fa-heart"></i>
+                    <span>Like ({{ data.get('likes', 0) }})</span>
+                </button>
+            </form>
+        </div>
+</form>
     </div>
     {% endfor %}
 </body>

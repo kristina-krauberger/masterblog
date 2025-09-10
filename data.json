@@ -3,12 +3,26 @@
         "id": 3,
         "author": "Mustermann",
         "title": "Test",
-        "content": "testtest"
+        "content": "testtest",
+        "likes": 1
     },
     {
         "id": 1,
         "author": "kydsjd",
         "title": "test2",
-        "content": "kjfksdfhkdhf\r\n"
+        "content": "kjfksdfhkdhf\r\n",
+        "likes": 3
+    },
+    {
+        "id": 2,
+        "author": "Kristina",
+        "title": "This is a new TITLE",
+        "content": "ldknfkndfvkdnkvn"
+    },
+    {
+        "id": 4,
+        "author": "test",
+        "title": "test",
+        "content": "test"
     }
 ]
