@@ -173,5 +173,33 @@ def update_like(post_id):
     return redirect(url_for("index"))
 
 
+@app.errorhandler(404)
+def page_not_found(error):
+    """
+    Render the 404 error page.
+
+    Args:
+        error: The raised error object.
+
+    Returns:
+        Response: Rendered 404 error template.
+    """
+    return render_template("404.html"), 404
+
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    """
+    Render the 500 error page.
+
+    Args:
+        error: The raised error object.
+
+    Returns:
+        Response: Rendered 500 error template.
+    """
+    return render_template("500.html"), 500
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5001, debug=True)
