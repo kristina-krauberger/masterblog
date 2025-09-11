@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from dotenv import load_dotenv
-import os
+from config.config import Config
 import json
 
-load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
+app.secret_key = Config.SECRET_KEY
 
 
 @app.route('/')
@@ -16,7 +15,7 @@ def index():
     Returns:
         Rendered HTML template with the list of blog posts.
     """
-    with open("data.json", "r", encoding="UTF-8") as fileobj:
+    with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
         blog_posts = json.load(fileobj)
 
     return render_template('index.html', posts=blog_posts)
@@ -38,7 +37,7 @@ def add():
         author = request.form.get("author", "--")
         content = request.form.get("content", "--")
 
-        with open("data.json", "r", encoding="UTF-8") as fileobj:
+        with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
             blog_posts = json.load(fileobj)
 
         existing_ids = {post["id"] for post in blog_posts}
@@ -55,7 +54,7 @@ def add():
 
         blog_posts.append(new_post)
 
-        with open("data.json", "w", encoding="UTF-8") as fileobj:
+        with open(Config.DATA_FILE, "w", encoding="UTF-8") as fileobj:
             json.dump(blog_posts, fileobj, indent=4, ensure_ascii=False)
 
         return redirect(url_for('index'))
@@ -73,7 +72,7 @@ def delete(post_id):
     Returns:
         Response: Redirect to the homepage after deletion.
     """
-    with open("data.json", "r", encoding="UTF-8") as fileobj:
+    with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
         blog_posts = json.load(fileobj)
 
     for index, blog_post in enumerate(blog_posts):
@@ -83,7 +82,7 @@ def delete(post_id):
             flash(f"The post '{blog_post['title']}' was successfully deleted.", "success")
             break
 
-    with open("data.json", "w", encoding="UTF-8") as fileobj:
+    with open(Config.DATA_FILE, "w", encoding="UTF-8") as fileobj:
         json.dump(blog_posts, fileobj, indent=4, ensure_ascii=False)
 
     return redirect(url_for('index'))
@@ -99,7 +98,7 @@ def fetch_post_by_id(post_id):
     Returns:
         dict or None: The blog post as a dictionary if found, otherwise None.
     """
-    with open("data.json", "r", encoding="UTF-8") as fileobj:
+    with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
         blog_posts = json.load(fileobj)
 
     for blog_post in blog_posts:
@@ -131,7 +130,7 @@ def update(post_id):
         author = request.form.get("author", "--")
         content = request.form.get("content", "--")
 
-        with open("data.json", "r", encoding="UTF-8") as fileobj:
+        with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
             blog_posts = json.load(fileobj)
 
         for post in blog_posts:
@@ -142,7 +141,7 @@ def update(post_id):
                 flash(f"The post '{post['title']}' was successfully updated.", "success")
                 break
 
-        with open("data.json", "w", encoding="UTF-8") as fileobj:
+        with open(Config.DATA_FILE, "w", encoding="UTF-8") as fileobj:
             json.dump(blog_posts, fileobj, indent=4, ensure_ascii=False)
 
         return redirect(url_for("index"))
@@ -160,7 +159,7 @@ def update_like(post_id):
     Returns:
         Response: Redirect to the homepage.
     """
-    with open("data.json", "r", encoding="UTF-8") as fileobj:
+    with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
         blog_posts = json.load(fileobj)
 
     for blog_post in blog_posts:
@@ -168,7 +167,7 @@ def update_like(post_id):
             blog_post['likes'] = blog_post.get('likes', 0) + 1
             break
 
-    with open("data.json", "w", encoding="UTF-8") as fileobj:
+    with open(Config.DATA_FILE, "w", encoding="UTF-8") as fileobj:
         json.dump(blog_posts, fileobj, indent=4, ensure_ascii=False)
 
     return redirect(url_for("index"))

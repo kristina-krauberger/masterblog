@@ -4,7 +4,7 @@
         "author": "Mustermann",
         "title": "Test",
         "content": "testtest",
-        "likes": 1
+        "likes": 3
     },
     {
         "id": 1,
@@ -22,7 +22,8 @@
     {
         "id": 4,
         "author": "test",
-        "title": "test",
-        "content": "test"
+        "title": "test2",
+        "content": "test",
+        "likes": 1
     }
 ]
