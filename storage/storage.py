@@ -1,5 +1,4 @@
 import json
-from traceback import format_list
 
 
 def loads_posts(data_file):

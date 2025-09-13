@@ -13,7 +13,6 @@ A simple blog application built with Flask that allows you to:
 
 - Python 3.10+
 - Flask
-- python-dotenv
 
 Install dependencies:
 
@@ -41,24 +40,26 @@ The app will run on `http://0.0.0.0:5001` by default.
 
 ```
 .
-├── app.py
+├── app.py                # Main Flask application
+├── storage/
+│   ├── __init__.py
+│   └── storage.py        # Handles data storage and retrieval
 ├── config/
-│   └── config.py
+│   ├── __init__.py
+│   └── config.py         # Application configuration variables
 ├── data/
-│   └── data.json
+│   └── data.json         # JSON file storing blog posts
 ├── templates/
-│   ├── index.html
-│   ├── add.html
-│   └── update.html
+│   ├── 404.html
+│   ├── 500.html
+│   ├── index.html        # Homepage displaying posts
+│   ├── add.html          # Form to add new posts
+│   └── update.html       # Form to edit existing posts
 ├── static/
-│   └── (your CSS files)
-├── requirements.txt
-└── .env
+│   └── style.css         # Stylesheet
+├── requirements.txt      # Python dependencies
+└── .env                  # Environment variables
 ```
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
