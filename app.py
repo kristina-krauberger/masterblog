@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from config.config import Config
-import json
-
+from storage.storage import loads_posts, save_posts
 
 app = Flask(__name__)
 app.secret_key = Config.SECRET_KEY
@@ -10,42 +9,38 @@ app.secret_key = Config.SECRET_KEY
 @app.route('/')
 def index():
     """
-    Render the homepage with a list of blog posts loaded from the JSON file.
+    Show homepage with blog posts using loads_posts.
 
-    Returns:
-        Rendered HTML template with the list of blog posts.
+    Returns: Rendered template with posts.
     """
-    try:
-        with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
-            blog_posts = json.load(fileobj)
-        return render_template('index.html', posts=blog_posts)
+    blog_posts = loads_posts(Config.DATA_FILE)
 
-    except (FileNotFoundError, json.JSONDecodeError):
-        blog_posts = []
+    if not blog_posts:
         flash("Error while loading file. File is empty or damaged.", "error")
         return render_template("index.html", posts=[])
+    else:
+        return render_template("index.html", posts=blog_posts)
 
 
 @app.route('/add', methods=['GET', 'POST'])
 def add():
     """
-    Handle GET and POST requests to add a new blog post.
+    Add a new blog post.
 
-    GET: Render the form to create a new blog post.
-    POST: Receive form data, append new post to JSON file, and redirect to homepage.
-
-    Returns:
-        Redirect or rendered HTML template depending on request method.
+    Returns: Redirect or rendered HTML template depending on request method.
     """
-    try:
-        if request.method == 'POST':
-            title = request.form.get("title", "--")
-            author = request.form.get("author", "--")
-            content = request.form.get("content", "--")
+    if request.method == 'POST':
+        title = request.form.get("title", "--")
+        author = request.form.get("author", "--")
+        content = request.form.get("content", "--")
 
-            with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
-                blog_posts = json.load(fileobj)
+        blog_posts = loads_posts(Config.DATA_FILE)
 
+        if not blog_posts:
+            flash("Error while loading file. File is empty or damaged.", "error")
+            return render_template("index.html", posts=[])
+
+        else:
             existing_ids = {post["id"] for post in blog_posts}
             new_id = 1
             while new_id in existing_ids:
@@ -60,16 +55,14 @@ def add():
 
             blog_posts.append(new_post)
 
-            with open(Config.DATA_FILE, "w", encoding="UTF-8") as fileobj:
-                json.dump(blog_posts, fileobj, indent=4, ensure_ascii=False)
+            if save_posts(Config.DATA_FILE, blog_posts):
+                return redirect(url_for('index'))
+            else:
+                flash("Error while saving posts.", "error")
+                return render_template("index.html", posts=blog_posts)
 
-            return redirect(url_for('index'))
+    else:
         return render_template('add.html')
-
-    except (FileNotFoundError, json.JSONDecodeError):
-        blog_posts = []
-        flash("Error while loading file. File is empty or damaged.", "error")
-        return render_template("index.html", posts=[])
 
 
 @app.route('/delete/<int:post_id>')
@@ -83,10 +76,14 @@ def delete(post_id):
     Returns:
         Response: Redirect to the homepage after deletion.
     """
-    try:
-        with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
-            blog_posts = json.load(fileobj)
 
+    blog_posts = loads_posts(Config.DATA_FILE)
+
+    if not blog_posts:
+        flash("Error while loading file. File is empty or damaged.", "error")
+        return render_template("index.html", posts=[])
+
+    else:
         for index, blog_post in enumerate(blog_posts):
             print(index)
             if post_id == blog_post["id"]:
@@ -94,15 +91,11 @@ def delete(post_id):
                 flash(f"The post '{blog_post['title']}' was successfully deleted.", "success")
                 break
 
-        with open(Config.DATA_FILE, "w", encoding="UTF-8") as fileobj:
-            json.dump(blog_posts, fileobj, indent=4, ensure_ascii=False)
-
-        return redirect(url_for('index'))
-
-    except (FileNotFoundError, json.JSONDecodeError):
-        blog_posts = []
-        flash("Error while loading file. File is empty or damaged.", "error")
-        return render_template("index.html", posts=[])
+        if save_posts(Config.DATA_FILE, blog_posts):
+            return redirect(url_for('index'))
+        else:
+            flash("Error while saving posts.", "error")
+            return render_template("index.html", posts=blog_posts)
 
 
 def fetch_post_by_id(post_id):
@@ -115,17 +108,17 @@ def fetch_post_by_id(post_id):
     Returns:
         dict or None: Post dictionary if found, else None.
     """
-    try:
-        with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
-            blog_posts = json.load(fileobj)
 
+    blog_posts = loads_posts(Config.DATA_FILE)
+
+    if not blog_posts:
+        flash("Error while loading file. File is empty or damaged.", "error")
+        return None
+
+    else:
         for blog_post in blog_posts:
             if post_id == blog_post["id"]:
                 return blog_post
-        return None
-
-    except (FileNotFoundError, json.JSONDecodeError):
-        flash("Error while loading file. File is empty or damaged.", "error")
         return None
 
 
@@ -143,37 +136,37 @@ def update(post_id):
     Returns:
         Response: Rendered update form (GET) or redirect to index page (POST).
     """
-    try:
-        searched_blog_post = fetch_post_by_id(post_id)
-        if searched_blog_post is None:
-            return "Post not found", 404
 
-        if request.method == 'POST':
-            title = request.form.get("title", "--")
-            author = request.form.get("author", "--")
-            content = request.form.get("content", "--")
+    searched_blog_post = fetch_post_by_id(post_id)
+    if searched_blog_post is None:
+        return "Post not found", 404
 
-            with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
-                blog_posts = json.load(fileobj)
+    if request.method == 'POST':
+        title = request.form.get("title", "--")
+        author = request.form.get("author", "--")
+        content = request.form.get("content", "--")
 
-            for post in blog_posts:
-                if searched_blog_post["id"] == post["id"]:
-                    post["title"] = title
-                    post["author"] = author
-                    post["content"] = content
-                    flash(f"The post '{post['title']}' was successfully updated.", "success")
-                    break
+        blog_posts = loads_posts(Config.DATA_FILE)
 
-            with open(Config.DATA_FILE, "w", encoding="UTF-8") as fileobj:
-                json.dump(blog_posts, fileobj, indent=4, ensure_ascii=False)
+        if not blog_posts:
+            flash("Error while loading file. File is empty or damaged.", "error")
+            return render_template("index.html", posts=[])
 
+        for post in blog_posts:
+            if searched_blog_post["id"] == post["id"]:
+                post["title"] = title
+                post["author"] = author
+                post["content"] = content
+                flash(f"The post '{post['title']}' was successfully updated.", "success")
+                break
+
+        if save_posts(Config.DATA_FILE, blog_posts):
             return redirect(url_for("index"))
-        return render_template('update.html', post=searched_blog_post)
+        else:
+            flash("Error while saving posts.", "error")
+            return render_template('update.html', post=searched_blog_post)
 
-    except (FileNotFoundError, json.JSONDecodeError):
-        block_posts = []
-        flash("Error while loading file. File is empty or damaged.", "error")
-        return render_template("index.html", posts=[])
+    return render_template('update.html', post=searched_blog_post)
 
 
 @app.route('/update_like/<int:post_id>', methods=['POST'])
@@ -187,24 +180,24 @@ def update_like(post_id):
     Returns:
         Response: Redirect to the homepage.
     """
-    try:
-        with open(Config.DATA_FILE, "r", encoding="UTF-8") as fileobj:
-            blog_posts = json.load(fileobj)
 
+    blog_posts = loads_posts(Config.DATA_FILE)
+
+    if not blog_posts:
+        flash("Error while loading file. File is empty or damaged.", "error")
+        return render_template("index.html", posts=[])
+
+    else:
         for blog_post in blog_posts:
             if post_id == blog_post['id']:
                 blog_post['likes'] = blog_post.get('likes', 0) + 1
                 break
 
-        with open(Config.DATA_FILE, "w", encoding="UTF-8") as fileobj:
-            json.dump(blog_posts, fileobj, indent=4, ensure_ascii=False)
-
-        return redirect(url_for("index"))
-
-    except (FileNotFoundError, json.JSONDecodeError):
-        blog_posts = []
-        flash("Error while loading file. File is empty or damaged.", "error")
-        return render_template("index.html", posts=[])
+        if save_posts(Config.DATA_FILE, blog_posts):
+            return redirect(url_for("index"))
+        else:
+            flash("Error while saving posts.", "error")
+            return render_template("index.html", posts=blog_posts)
 
 
 @app.errorhandler(404)
