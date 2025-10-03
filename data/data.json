@@ -1,29 +1,32 @@
 [
     {
         "id": 3,
-        "author": "Mustermann",
-        "title": "Test",
-        "content": "testtest",
-        "likes": 3
+        "author": "fgfg",
+        "title": "dfgfg",
+        "content": "hfgh"
+    },
+    {
+        "id": 4,
+        "author": "dfgdfg",
+        "title": "sfdfg",
+        "content": "dfgdg"
     },
     {
         "id": 1,
-        "author": "kydsjd",
-        "title": "test2",
-        "content": "kjfksdfhkdhf\r\n",
-        "likes": 3
-    },
-    {
-        "id": 2,
-        "author": "Kristina",
-        "title": "This is a new TITLE",
-        "content": "ldknfkndfvkdnkvn"
+        "author": "dfgdg",
+        "title": "fghfh",
+        "content": "dfgdfg"
     },
     {
         "id": 5,
-        "author": "YOU",
-        "title": "HELLO",
-        "content": "ROCK!!!!!",
-        "likes": 1
+        "author": "hfg",
+        "title": "dfg",
+        "content": "fgh"
+    },
+    {
+        "id": 6,
+        "author": "rtrt",
+        "title": "ft",
+        "content": "rt"
     }
 ]

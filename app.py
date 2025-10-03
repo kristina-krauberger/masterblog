@@ -15,8 +15,8 @@ def index():
     """
     blog_posts = loads_posts(Config.DATA_FILE)
 
-    if not blog_posts:
-        flash("Error while loading file. File is empty or damaged.", "error")
+    if blog_posts is None:
+        flash("Error wh†ile loading file. File is empty or damaged.", "error")
         return render_template("index.html", posts=[])
     else:
         return render_template("index.html", posts=blog_posts)
@@ -30,15 +30,18 @@ def add():
     Returns: Redirect or rendered HTML template depending on request method.
     """
     if request.method == 'POST':
-        title = request.form.get("title", "--")
-        author = request.form.get("author", "--")
-        content = request.form.get("content", "--")
+        title = request.form.get("title", "--").strip()
+        author = request.form.get("author", "--").strip()
+        content = request.form.get("content", "--").strip()
+
+        if not title or not author or not content:
+            flash("All fields are required and cannot be empty.", "error")
+            return render_template('add.html')
 
         blog_posts = loads_posts(Config.DATA_FILE)
 
-        if not blog_posts:
-            flash("Error while loading file. File is empty or damaged.", "error")
-            return render_template("index.html", posts=[])
+        if blog_posts is None:
+            blog_posts = []
 
         else:
             existing_ids = {post["id"] for post in blog_posts}
@@ -201,7 +204,7 @@ def update_like(post_id):
 
 
 @app.errorhandler(404)
-def page_not_found(error):
+def page_not_found(error): #
     """
     Render the 404 error page.
 
@@ -211,7 +214,7 @@ def page_not_found(error):
     Returns:
         Response: Rendered 404 error template.
     """
-    return render_template("404.html"), 404
+    return render_template("404.html", error=error), 404
 
 
 @app.errorhandler(500)
@@ -225,7 +228,7 @@ def internal_server_error(error):
     Returns:
         Response: Rendered 500 error template.
     """
-    return render_template("500.html"), 500
+    return render_template("500.html", error=error), 500
 
 
 if __name__ == '__main__':

@@ -18,6 +18,15 @@
         <textarea id="content" name="content" rows="5" cols="40" required></textarea><br><br>
 
         <input type="submit" value="Submit Post" class="button-add">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <ul class="flash-messages">
+                {% for category, message in messages %}
+                  <p class="flash-{{ category }}">{{ message }}</p>
+                {% endfor %}
+              </ul>
+            {% endif %}
+        {% endwith %}
     </form>
 </body>
 </html>
